@@ -5,6 +5,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+  <script src="momnet.js"></script>
+
+
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@0.13.3/dist/tf.min.js"></script>
@@ -110,9 +114,9 @@
    }
 
    async function onTrainClick() {
-
       var inputs = sma_vec.map(function(inp_f) {
           return inp_f['set'].map(function(val) { return val['price']; })});
+
       var outputs = sma_vec.map(function(outp_f) { return outp_f['avg']; });
 
       var n_epochs     = parseInt(document.getElementById("n-epochs").value);
@@ -120,6 +124,10 @@
       var lr_rate      = parseFloat(document.getElementById("learning-rate").value);
       var n_hl         = parseInt(document.getElementById("hidden-layers").value);
       var n_items      = parseInt(document.getElementById("n-items-percent").value);
+
+      // console.log('data_raw :>> ', data_raw);
+      // console.log('sma_vec :>> ', sma_vec);
+      // return;
 
       var callback = function(epoch, log) {
           var log_nn = document.getElementById("nn_log").innerHTML;
@@ -129,40 +137,49 @@
           document.getElementById("training_pg").innerHTML = ((epoch + 1) * (100 / n_epochs)).toString() + "%";
       }
 
-      result = await trainModel(inputs, outputs,
- n_items, window_size, n_epochs, lr_rate, n_hl, callback);
+      result = await trainModel(inputs, outputs, n_items, window_size, n_epochs, lr_rate, n_hl, callback);
 
       alert('Your model has been successfully trained...');
    }
 
    function onPredictClick(view) {
-      var inputs = sma_vec.map(function(inp_f) {
- return inp_f['set'].map(function (val) { return val['price']; }); });
-      var outputs = sma_vec.map(function(outp_f) { return outp_f['avg']; });
+      var inputs = sma_vec.map(function (inp_f) {
+         return inp_f['set'].map(function (val) { return val['price']; });
+      });
+      console.log('sma_vec :>> ', sma_vec);
+      console.log('inputs :>> ', inputs);
+
+      var outputs = sma_vec.map(function (outp_f) { return outp_f['avg']; });
+
+      console.log('outputs :>> ', outputs);
 
       var n_items = parseInt(document.getElementById("n-items-percent").value);
 
       var outps = outputs.slice(Math.floor(n_items / 100 * outputs.length), outputs.length);
 
+      console.log('result :>> ', result);
+
       var pred_vals = Predict(inputs, n_items, result['model']);
 
+      console.log('pred_vals :>> ', pred_vals);
+
       var data_output = "";
+
       for (var index = 0; index < pred_vals.length; index++) {
-           data_output += "<tr><td>" + (index + 1) + "</td><td>" +
-       outps[index] + "</td><td>" + pred_vals[index] + "</td></tr>";             
+         data_output += "<tr><td>" + (index + 1) + "</td><td>" +
+            outps[index] + "</td><td>" + pred_vals[index] + "</td></tr>";
       }
 
       document.getElementById("pred-res").innerHTML = "<table class=\"table\"><thead><tr><th scope=\"col\">#</th><th scope=\"col\">Real Value</th> \
- <th scope=\"col\">Predicted Value</th></thead><tbody>" + data_output + "</tbody></table>";
+      <th scope=\"col\">Predicted Value</th></thead><tbody>" + data_output + "</tbody></table>";
 
       var window_size  = parseInt(document.getElementById("window-size").value);
 
       var timestamps_a = data_raw.map(function (val) { return val['timestamp']; });
-      var timestamps_b = data_raw.map(function (val) {
- return val['timestamp']; }).splice(window_size, data_raw.length);
+      var timestamps_b = data_raw.map(function (val) {return val['timestamp']; }).splice(window_size, data_raw.length);
 
       var timestamps_c = data_raw.map(function (val) {
- return val['timestamp']; }).splice(window_size + Math.floor(n_items / 100 * outputs.length), data_raw.length);
+      return val['timestamp']; }).splice(window_size + Math.floor(n_items / 100 * outputs.length), data_raw.length);
 
       var sma = sma_vec.map(function (val) { return val['avg']; });
       var prices = data_raw.map(function (val) { return val['price']; });
@@ -244,7 +261,7 @@
 
       var timestamps_a = data_raw.map(function (val) { return val['timestamp']; });
       var timestamps_b = data_raw.map(function (val) {
- return val['timestamp']; }).splice(window_size, data_raw.length);
+      return val['timestamp']; }).splice(window_size, data_raw.length);
 
       var graph_plot = document.getElementById('graph');
       Plotly.newPlot( graph_plot, [{ x: timestamps_a, y: prices, name: "Series" }], { margin: { t: 0 } } );
