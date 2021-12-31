@@ -253,9 +253,9 @@ async function onClickPredict() {
 
   console.log('result[model] :>> ', result['model']);
 
-  result['model'].summary();
+  // result['model'].summary();
 
-  let pred_y = makePredictions(pred_X, model, result['normalize']);
+  let pred_y = makePredictions(pred_X, result['model'], result['normalize']);
 
   console.log('pred_Y :>> ', pred_y);
 
