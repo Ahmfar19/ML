@@ -13,7 +13,7 @@
   <link href="https://jinglescode.github.io/assets/css/materialize.min.css" type="text/css" rel="stylesheet" media="screen,projection"/>
   <link href="https://jinglescode.github.io/assets/css/custom.css" type="text/css" rel="stylesheet" media="screen,projection"/>
   <link rel="preload" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" as="style" onload="this.rel='stylesheet'">
-  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-49548145-2"></script>
+  <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=UA-49548145-2"></script> -->
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
@@ -122,12 +122,12 @@
           </div>
         </div>
 
-        <div class="row" id="div_container_linegraph" style="display:none">
+        <div class="row" id="div_container_linegraph">
           <div class="col s12">
             <div class="card z-depth-2">
               <div class="card-content">
                 <span class="card-title">Loaded Stocks Data</span>
-                <span class="card-title grey-text text-darken-4" id="div_linegraph_data_title">Card Title<</span>
+                <span class="card-title grey-text text-darken-4" id="div_linegraph_data_title">Card Title</span>
                 <div>
                   <div id="div_linegraph_data" style="width:100%; height:350px;"></div>
                 </div>
@@ -161,12 +161,13 @@
           <div class="col s6">
             <div class="input-field col s12">
               <label for="input_windowsize">Window Size</label>
-              <input type="number" id="input_windowsize" placeholder="a number" value="12">
+              <input type="number" id="input_windowsize" placeholder="a number" value="1">
               <small class="form-text text-muted">This is the "time window" for SMA</small>
             </div>
           </div>
           <div class="col s12">
             <button class="waves-effect waves-light btn" id="btn_draw_sma" onclick="onClickDisplaySMA()">Compute SMA and Draw Chart</button>
+            
             <div class="spinner-border" id="load_draw_sma"></div>
           </div>
         </div>
@@ -186,7 +187,7 @@
             <div class="card z-depth-2">
               <div class="card-content">
                 <span class="card-title grey-text text-darken-4">Training Data (top 25 rows)</span>
-                <div style="overflow-x: scroll;" id="div_trainingdata">
+                <div style="overflow-x: scroll;max-height: 400px;" id="div_trainingdata">
               </div>
             </div>
             </div>
@@ -223,7 +224,7 @@
             <div class="col s6">
               <div class="input-field col s12">
                 <label for="input_trainingsize">Training Dataset Size (%)</label>
-                <input type="number" id="input_trainingsize" placeholder="a number between (1-99)" value="98">
+                <input type="number" id="input_trainingsize" placeholder="a number between (1-99)" value="50">
               </div>
             </div>
             <div class="col s6">
@@ -254,7 +255,7 @@
           </div>
         </div>
 
-        <div class="row" id="div_container_training" style="display:none">
+        <div class="row" id="div_container_training">
           <div class="col s12">
             <div class="card z-depth-2">
               <div class="card-content">
@@ -299,7 +300,7 @@
           </div>
         </div>
 
-        <div class="row" id="div_container_validate" style="display:none">
+        <div class="row" id="div_container_validate">
           <div class="col s12">
             <p>
               <!-- [how to use, what you want your reader to do after you end, as simple and obvious] -->
@@ -308,10 +309,12 @@
           </div>
           <div class="col s6">
             <button class="waves-effect waves-light btn" id="btn_validation" onclick="onClickValidate()">Validate Model</button>
-            <div class="spinner-border" id="load_validating" style="display:none"></div>
+            <button class="waves-effect waves-light btn" id="btn_validation" onclick="onClickValidateEgen()">Validate Egen</button>
+
+            <div class="spinner-border" id="load_validating"></div>
           </div>
         </div>
-        <div class="row" id="div_container_validating" style="display:none">
+        <div class="row" id="div_container_validating">
           <div class="col s12">
             <div class="card z-depth-2">
               <div class="card-content">
@@ -372,7 +375,7 @@
   <script src="https://jinglescode.github.io/assets/js/materialize.min.js" type="text/javascript"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.0.0/dist/tf.min.js"></script>
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-
+  <script src="data_raw.js"></script>
   <script src="./model.js"></script>
   <script src="./index.js"></script>
 

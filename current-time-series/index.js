@@ -5,18 +5,36 @@ let sma_vec = [];
 let window_size = 50;
 let trainingsize = 70;
 let data_temporal_resolutions = 'Weekly';
+let add_days = 1;
 
 $(document).ready(function () {
-
   $('select').formSelect();
-
 });
 
+/**********PART1************/
 
 function onClickChangeDataFreq(freq) {
   console.log(freq.value);
   data_temporal_resolutions = freq.value;
 }
+
+async function getData(){
+  // console.log('sampels :>> ', sampels);
+  data_raw = sampels;
+  if (data_raw.length > 0) {
+    let timestamps = data_raw.map(function (val) { return val['timestamp']; });
+    let prices = data_raw.map(function (val) { return val['price']; });
+    let graph_plot = document.getElementById('div_linegraph_data');
+    Plotly.newPlot(graph_plot, [{ x: timestamps, y: prices, name: "Stocks Prices" }], { margin: { t: 0 } });
+  }
+
+  $("#div_container_getsma").show();
+  $("#div_container_getsmafirst").hide();
+}
+
+$(function () {
+  getData();
+});
 
 async function onClickFetchData() {
   $("#btn_fetch_data").hide();
@@ -24,6 +42,8 @@ async function onClickFetchData() {
 
   var samples = $("#input_ticker").val();
   data_raw = await GenerateDataset(samples);
+
+  console.log('data_raw :>> ', data_raw);
 
   $("#btn_fetch_data").show();
   $("#load_fetch_data").hide();
@@ -58,6 +78,7 @@ function GenerateDataset(n) {
   return dataset;
 }
 
+/**********PART2************/
 
 function onClickDisplaySMA() {
   $("#load_draw_sma").show();
@@ -92,7 +113,6 @@ function onClickDisplaySMA() {
   displayTrainingData();
 }
 
-
 function displayTrainingData() {
   $("#div_container_trainingdata").show();
   let set = sma_vec.map(function (val) { return val['set']; });
@@ -120,12 +140,14 @@ function displayTrainingData() {
   );
 }
 
+/********** PART3- TRAINMODEL ************/
+
 async function onClickTrainModel() {
 
   let epoch_loss = [];
 
   $("#div_container_training").show();
-  $("#btn_draw_trainmodel").hide();
+  // $("#btn_draw_trainmodel").hide();
 
   document.getElementById("div_traininglog").innerHTML = "";
 
@@ -168,17 +190,18 @@ async function onClickTrainModel() {
   document.getElementById("div_traininglog").innerHTML = logHtml;
 
   $("#div_container_validate").show();
-  $("#div_container_validatefirst").hide();
+  // $("#div_container_validatefirst").hide();
   $("#div_container_predict").show();
-  $("#div_container_predictfirst").hide();
+  // $("#div_container_predictfirst").hide();
 
 }
+
+/********** PART3- VALIDATE ************/
 
 function onClickValidate() {
 
   $("#div_container_validating").show();
   $("#load_validating").show();
-  $("#btn_validation").hide();
 
   let inputs = sma_vec.map(function (inp_f) {
     return inp_f['set'].map(function (val) { return val['price']; });
@@ -186,14 +209,15 @@ function onClickValidate() {
 
   // validate on training
   let val_train_x = inputs.slice(0, Math.floor(trainingsize / 100 * inputs.length));
-  
   // console.log('val_train_x', val_train_x)
+
   let val_train_y = makePredictions(val_train_x, result['model'], result['normalize']);
   // console.log('val_train_y', val_train_y)
 
   // validate on unseen
   let val_unseen_x = inputs.slice(Math.floor(trainingsize / 100 * inputs.length), inputs.length);
   // console.log('val_unseen_x', val_unseen_x)
+
   let val_unseen_y = makePredictions(val_unseen_x, result['model'], result['normalize']);
   // console.log('val_unseen_y', val_unseen_y)
 
@@ -221,17 +245,56 @@ function onClickValidate() {
   $("#load_validating").hide();
 }
 
-let add_days = 1;
+function onClickValidateEgen() {
 
-var mod;
-fetch('model.json')
-.then(response => response.json())
-.then(data => mod = data);
+  let inputs = sma_vec.map(function (inp_f) {
+    return inp_f['set'].map(function (val) { return val['price']; });
+  });
+
+  // validate on training
+  let val_train_x = inputs.slice(0, Math.floor(trainingsize / 100 * inputs.length));
+  console.log('val_train_x', val_train_x)
+  console.log('trainingsize :>> ', trainingsize);
+  return;
+  let val_train_y = makePredictions(val_train_x, result['model'], result['normalize']);
+  // console.log('val_train_y', val_train_y)
+
+  // validate on unseen
+  let val_unseen_x = inputs.slice(Math.floor(trainingsize / 100 * inputs.length), inputs.length);
+  // console.log('val_unseen_x', val_unseen_x)
+
+  let val_unseen_y = makePredictions(val_unseen_x, result['model'], result['normalize']);
+  // console.log('val_unseen_y', val_unseen_y)
+  let timestamps_a = data_raw.map(function (val) { return val['timestamp']; });
+
+  let timestamps_b = data_raw.map(function (val) {
+    return val['timestamp'];
+  }).splice(window_size, (data_raw.length - Math.floor((100 - trainingsize) / 100 * data_raw.length))); //.splice(window_size, data_raw.length);
+
+
+  let timestamps_c = data_raw.map(function (val) {
+    return val['timestamp'];
+  }).splice(window_size + Math.floor(trainingsize / 100 * inputs.length), inputs.length);
+
+  let sma = sma_vec.map(function (val) { return val['avg']; });
+  let prices = data_raw.map(function (val) { return val['price']; });
+  sma = sma.slice(0, Math.floor(trainingsize / 100 * sma.length));
+  // console.log('sma', sma)
+
+  let graph_plot = document.getElementById('div_validation_graph');
+  Plotly.newPlot(graph_plot, [{ x: timestamps_a, y: prices, name: "Actual Price" }], { margin: { t: 0 } });
+  Plotly.plot(graph_plot, [{ x: timestamps_b, y: sma, name: "Training Label (SMA)" }], { margin: { t: 0 } });
+  Plotly.plot(graph_plot, [{ x: timestamps_b, y: val_train_y, name: "Predicted (train)" }], { margin: { t: 0 } });
+  Plotly.plot(graph_plot, [{ x: timestamps_c, y: val_unseen_y, name: "Predicted (test)" }], { margin: { t: 0 } });
+
+}
+
+// var mod;
+// fetch('model.json').then(response => response.json()).then(data => mod = data);
 
 async function onClickPredict() {
   $("#div_container_predicting").show();
   $("#load_predicting").show();
-  // $("#btn_prediction").hide();
 
   let inputs = sma_vec.map(function (inp_f) {
     return inp_f['set'].map(function (val) { return val['price']; });
@@ -247,10 +310,6 @@ async function onClickPredict() {
   pred_X = pred_X.slice(Math.floor(trainingsize / 100 * pred_X.length), pred_X.length);
 
   console.log('pred_X :>> ', pred_X);
-
-  console.log('result[model] :>> ', result['model']);
-
-  // result['model'].summary();
 
   let pred_y = makePredictions(pred_X, result['model'], result['normalize']);
 
@@ -273,11 +332,7 @@ async function onClickPredict() {
     add_days += 30;
   }
 
-  console.log('add_days :>> ', add_days);
-
   last_date.setDate(last_date.getDate() + add_days);
-
-  console.log('last_date :>> ', last_date);
 
   let next_date = await formatDate(last_date.toString());
 
@@ -295,6 +350,8 @@ async function onClickPredict() {
 
   $("#load_predicting").hide();
 }
+
+/********** PART4- UTILTIE ************/
 
 function ComputeSMA(data, window_size) {
   let r_avgs = [], avg_prev = 0;
