@@ -186,8 +186,7 @@ function onClickValidate() {
 
   // validate on training
   let val_train_x = inputs.slice(0, Math.floor(trainingsize / 100 * inputs.length));
-  // let outputs = sma_vec.map(function(outp_f) { return outp_f['avg']; });
-  // let outps = outputs.slice(0, Math.floor(trainingsize / 100 * inputs.length));
+  
   // console.log('val_train_x', val_train_x)
   let val_train_y = makePredictions(val_train_x, result['model'], result['normalize']);
   // console.log('val_train_y', val_train_y)
@@ -202,9 +201,8 @@ function onClickValidate() {
   let timestamps_b = data_raw.map(function (val) {
     return val['timestamp'];
   }).splice(window_size, (data_raw.length - Math.floor((100 - trainingsize) / 100 * data_raw.length))); //.splice(window_size, data_raw.length);
-  // let timestamps_c = data_raw.map(function (val) {
-  //   return val['timestamp'];
-  // }).splice(window_size + Math.floor(trainingsize / 100 * val_unseen_x.length), data_raw.length);
+
+
   let timestamps_c = data_raw.map(function (val) {
     return val['timestamp'];
   }).splice(window_size + Math.floor(trainingsize / 100 * inputs.length), inputs.length);
@@ -231,7 +229,6 @@ fetch('model.json')
 .then(data => mod = data);
 
 async function onClickPredict() {
-
   $("#div_container_predicting").show();
   $("#load_predicting").show();
   // $("#btn_prediction").hide();
@@ -335,7 +332,6 @@ async function run() {
 // run();
 
 $("#upload-weights").change(async function () {
-  console.log('asdadsadas');
   const uploadJSONInput = document.getElementById('upload-json');
   const uploadWeightsInput = document.getElementById('upload-weights');
   const model = await tf.loadLayersModel(tf.io.browserFiles([uploadJSONInput.files[0], uploadWeightsInput.files[0]]));

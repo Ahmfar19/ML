@@ -57,26 +57,7 @@
         <h1 class="title grey-text text-darken-4">Time Series Forecasting with TensorFlow.js</h1>
         <h5 class="subtitle grey-text text-darken-2">Pull stock prices from online API and perform predictions using Recurrent Neural Network and Long Short-Term Memory (LSTM) with TensorFlow.js framework.</h5>
       </div>
-      <div class="card-image">
-        <img src="https://jinglescode.github.io/assets/img/posts/time-series-00.jpg" alt="Time Series Forecasting with TensorFlow.js">
-      </div>
       <div class="card-content">
-        <p>
-          <!-- [write about the purpose for this experiment] -->
-          Machine learning is becoming increasingly popular these days and a growing number of the world’s population see it is as a magic crystal ball: predicting when and what will happen in the future. This experiment uses artificial neural networks to reveal stock market trends and demonstrates the ability of time series forecasting to predict future stock prices based on past historical data.
-        </p>
-        <p>
-          <!-- [disclaimer] -->
-          <b>Disclaimer</b>: As stock markets fluctuation are dynamic and unpredictable owing to multiple factors, this experiment is 100% educational and by no means a trading prediction tool.
-        </p>
-        <p>
-          <!-- [how to use this experiment, outline] -->
-          There are 4 parts to this experiment:
-          <li>get historical stocks prices data</li>
-          <li>prepare training data for our neural network model</li>
-          <li>training the neural network</li>
-          <li>do some prediction</li>
-        </p>
         <p>
           Also, do check out this repo for the <a href="https://github.com/jinglescode/time-series-forecasting-pytorch" target="_blank">PyTorch version</a> where we dig deeper on the model and the data processing steps.
         </p>
@@ -92,25 +73,7 @@
     <div class="card" id="div_data">
       <div class="card-content">
         <span class="card-title">Get Stocks Data</span>
-        <p>
-          <!-- [purpose of this step, fun for the reader] -->
-          Before we can train the neural network and make any predictions, we will first require data. The type of data we are looking for is time series: a sequence of numbers in chronological order. A good place to fetch these data is the <a href="https://www.alphavantage.co" target="_blank">Alpha Vantage Stock API</a>. This API allows us to retrieve chronological data on specific company stocks prices from the last 20 years. You may also refer to <a href="https://medium.com/@patrick.collins_58673/stock-api-landscape-5c6e054ee631" target="_blank">this article</a>. that explains adjusted stock prices, which is an important technical concept for working with historical market data. 
-        </p>
-        <p>
-          You can either pick <a href="https://www.alphavantage.co/documentation/#dailyadj" target="_blank">daily adjusted</a> or <a href="https://www.alphavantage.co/documentation/#weeklyadj" target="_blank">weekly adjusted</a>, open/high/low/close/volume values, daily adjusted close values, and historical split/dividend events of the global equity specified, covering 20+ years of historical data. As suggested by <a href="https://github.com/jinglescode/time-series-forecasting-tensorflowjs/issues/4" target="_blank">desduvauchelle</a>, using adjusted close price is more robust to stock split compared to using closing price.
-        </p>
-        <p>
-          The API yields the following fields:
-          <li>open price</li>
-          <li>highest price of that day</li>
-          <li>lowest price of that day</li>
-          <li>closing price</li>
-          <li>adjusted close price (this is used in this project)</li>
-          <li>volume</li>
-        </p>
-        <p>
-          To prepare training dataset for our neural network, we will be using adjusted close stocks price; which also means that we will be aiming to predict future closing price.
-        </p>
+
 
         <span class="card-title">Try It</span>
 
@@ -180,14 +143,6 @@
     <div class="card" id="div_sma">
       <div class="card-content">
         <span class="card-title">Simple Moving Average</span>
-        <p>
-          <!-- [purpose of this step, fun for the reader] -->
-          For this experiment, we are using <a href="https://en.wikipedia.org/wiki/Supervised_learning" target="_blank">supervised learning</a>, which means feeding data to the neural network and it learns by mapping input data to the output label. One way to prepare the training dataset is to extract Simple Moving Average from that time series data.
-        </p>
-        <p>
-          <a href="https://www.investopedia.com/terms/s/sma.asp" target="_blank">Simple Moving Average (SMA)</a> is a method to identify trends direction for a certain period of time, by looking at the average of all the values within that time window. The number of prices in a time window is selected experimentally. For example, let's assume the closing prices for past 5 days were 13, 15, 14, 16, 17, the SMA would be (13+15+14+16+17)/5 = 15. So the <i>input</i> for our training dataset is the set of prices within a single time window, and <i>label</i> is the computed moving average of those prices.
-        </p>
-
         <span class="card-title">Try It</span>
 
         <div class="row" id="div_container_getsmafirst">
@@ -245,24 +200,6 @@
     <div class="card" id="div_train">
       <div class="card-content">
         <span class="card-title">Train Neural Network</span>
-        <p>
-          <!-- [purpose of this step, fun for the reader] -->
-          Now that you have the training data, it is time to create a model for time series prediction, to achieve this we will use <a href="https://js.tensorflow.org/" target="_blank">TensorFlow.js</a> framework.
-        </p>
-        <p>
-          <a href="https://js.tensorflow.org/api/latest/#sequential" target="_blank">Sequential model</a> is selected which simply connects each layer and pass the data from input to the output during the training process. In order for the model to learn time series data which are sequential, <a href="https://js.tensorflow.org/api/latest/#layers.rnn" target="_blank">recurrent neural network (RNN) layer</a> layer is created and a number of <a href="https://js.tensorflow.org/api/latest/#layers.lstmCell" target="_blank">LSTM cells</a> are added to the RNN.
-        </p>
-        <p>
-          The model will be trained using <a href="https://js.tensorflow.org/api/latest/#train.adam" target="_blank">Adam</a> (<a href="https://arxiv.org/abs/1412.6980" target="_blank">read more</a>), a popular optimisation algorithm for machine learning. <a href="https://js.tensorflow.org/api/latest/#losses.meanSquaredError" target="_blank">Root-means-squared error</a> which determine the difference between predicted values and the actual values, so model is able to learn by minimising the error during the training process.
-        </p>
-        <p>
-          <!-- [how to use, what you want your reader to do after you end, as simple and obvious] -->
-          These are the hyperparameters (parameters used in the training process) available for tweaking:
-          <li>Training Dataset Size (%): the amount of data used for training, and remaining data will be used for prediction</li>
-          <li>Epochs: number of times the dataset is used to train the model (<a href="https://machinelearningmastery.com/difference-between-a-batch-and-an-epoch/" target="_blank">learn more</a>)</li>
-          <li>Learning Rate: amount of change in the weights during training in each step (<a href="https://machinelearningmastery.com/learning-rate-for-deep-learning-neural-networks/" target="_blank">learn more</a>)</li>
-          <li>Hidden LSTM Layers: to increase the model complexity to learn in higher dimensional space (<a href="https://machinelearningmastery.com/how-to-configure-the-number-of-layers-and-nodes-in-a-neural-network/" target="_blank">learn more</a>)</li>
-        </p>
 
         <span class="card-title">Try It</span>
         <p>
@@ -429,59 +366,6 @@
       </div>
     </div>
     <!-- E Make Prediction -->
-
-
-    <div class="card">
-      <div class="card-content">
-        <span class="card-title">Conclusion</span>
-        <p>
-          Why isn’t my Model Performing?<br/>
-          The model has never seen similar data in the past. In March 2020, where the market dipped and recovered within a month or two, this has never happened in history. The model is likely to fail to predict drastic changes in stock prices during those periods.<br/>
-          We can add more features. In a general sense, more features tend to make the model perform better. We can include trading indicators such as Moving average convergence divergence (MACD), Relative strength index (RSI), or Bollinger bands.<br/>
-          Add even more features. One amazing thing that <a href="https://www.alphavantage.co/documentation/#fundamentals" target="_blank">Alpha Vantage API</a> provides is Fundamental Data. This means that you can also include annual and quarterly income statements and cash flows for the company of interest. Who knows, those features might be useful.<br/>
-          There could have many other reasons why the model fails to learn and predict. This is the challenge of machine learning; it is both an art and science to build good performing models.
-        </p>
-
-        <p>
-          There are many ways to do time series prediction other than using a simple moving average. Do check out this repo for the <a href="https://github.com/jinglescode/time-series-forecasting-pytorch" target="_blank">PyTorch version</a> where we attempt to predict the stock price instead of the SMA. Other possible future work is to implement this with more data from various sources.<br/>
-          With TensorFlow.js, machine learning on a web browser is possible, and it is actually pretty cool.<br/>
-          Explore the demo on Github, this experiment is 100% educational and by no means a trading prediction tool.
-        </p>
-      </div>
-    </div>
-    <!-- E Conclusion -->
-
-
-    <div class="row">
-      <div class="col s12 m4">
-        <a href="https://github.com/jinglescode/time-series-forecasting-tensorflowjs" style="color:#000;">
-          <center>
-            <i class="fab fa-github" style="font-size: 100px;"></i><br/>
-            <span style="font-size:40px;">GitHub Repository</span><br/>
-            <p>Get the completed code</p><br/>
-          </center>
-        </a>
-      </div>
-      <div class="col s12 m4">
-        <a href="https://jinglescode.github.io/playground/" style="color:#000;">
-          <center>
-            <i class="fas fa-laptop-code" style="font-size: 100px;"></i><br/>
-            <span style="font-size:40px;">Playground</span><br/>
-            <p>Check out other projects</p><br/>
-          </center>
-        </a>
-      </div>
-      <div class="col s12 m4">
-        <a href="https://www.linkedin.com/in/jingles/" style="color:#000;">
-          <center>
-            <i class="fab fa-linkedin-in" style="font-size: 100px;"></i><br/>
-            <span style="font-size:40px;">Connect</span><br/>
-            <p>Connect with me on LinkedIn</p><br/>
-          </center>
-        </a>
-      </div>
-    </div>
-
   </div> <!-- E container -->
 
   <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
