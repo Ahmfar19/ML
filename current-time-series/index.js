@@ -332,7 +332,7 @@ async function run() {
   model.summary();
 }
 
-run();
+// run();
 
 $("#upload-weights").change(async function () {
   console.log('asdadsadas');
