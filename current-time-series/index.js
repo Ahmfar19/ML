@@ -3,7 +3,7 @@ let result = [];
 let data_raw = [];
 let sma_vec = [];
 let window_size = 50;
-let trainingsize = 70;
+let trainingsize = 50;
 let data_temporal_resolutions = 'Weekly';
 let add_days = 1;
 
@@ -19,7 +19,7 @@ function onClickChangeDataFreq(freq) {
 }
 
 async function getData(){
-  // console.log('sampels :>> ', sampels);
+  console.log('sampels :>> ', sampels);
   data_raw = sampels;
   if (data_raw.length > 0) {
     let timestamps = data_raw.map(function (val) { return val['timestamp']; });
@@ -28,12 +28,12 @@ async function getData(){
     Plotly.newPlot(graph_plot, [{ x: timestamps, y: prices, name: "Stocks Prices" }], { margin: { t: 0 } });
   }
 
-  $("#div_container_getsma").show();
   $("#div_container_getsmafirst").hide();
 }
 
 $(function () {
   getData();
+  onClickDisplaySMA();
 });
 
 async function onClickFetchData() {
@@ -140,7 +140,7 @@ function displayTrainingData() {
   );
 }
 
-/********** PART3- TRAINMODEL ************/
+/********** PART3 - TRAINMODEL ************/
 
 async function onClickTrainModel() {
 
@@ -196,7 +196,7 @@ async function onClickTrainModel() {
 
 }
 
-/********** PART3- VALIDATE ************/
+/********** PART3 - VALIDATE ************/
 
 function onClickValidate() {
 
@@ -245,7 +245,16 @@ function onClickValidate() {
   $("#load_validating").hide();
 }
 
-function onClickValidateEgen() {
+async function onClickValidateEgen() {
+
+  const MODEL_URL = 'http://localhost/htcdoc/teeeeeeeeeee/model_sma1/model.json';
+  // const model = await tf.loadLayersModel(MODEL_URL);
+  // const model = await tf.loadLayersModel('model.json');
+
+  const model = await tf.loadLayersModel(MODEL_URL);
+  model.summary();
+
+  return;
 
   let inputs = sma_vec.map(function (inp_f) {
     return inp_f['set'].map(function (val) { return val['price']; });
@@ -255,7 +264,7 @@ function onClickValidateEgen() {
   let val_train_x = inputs.slice(0, Math.floor(trainingsize / 100 * inputs.length));
   console.log('val_train_x', val_train_x)
   console.log('trainingsize :>> ', trainingsize);
-  return;
+
   let val_train_y = makePredictions(val_train_x, result['model'], result['normalize']);
   // console.log('val_train_y', val_train_y)
 
@@ -286,7 +295,6 @@ function onClickValidateEgen() {
   Plotly.plot(graph_plot, [{ x: timestamps_b, y: sma, name: "Training Label (SMA)" }], { margin: { t: 0 } });
   Plotly.plot(graph_plot, [{ x: timestamps_b, y: val_train_y, name: "Predicted (train)" }], { margin: { t: 0 } });
   Plotly.plot(graph_plot, [{ x: timestamps_c, y: val_unseen_y, name: "Predicted (test)" }], { margin: { t: 0 } });
-
 }
 
 // var mod;
