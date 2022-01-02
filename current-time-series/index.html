@@ -161,7 +161,7 @@
           <div class="col s6">
             <div class="input-field col s12">
               <label for="input_windowsize">Window Size</label>
-              <input type="number" id="input_windowsize" placeholder="a number" value="1">
+              <input type="number" id="input_windowsize" placeholder="a number" value="12">
               <small class="form-text text-muted">This is the "time window" for SMA</small>
             </div>
           </div>
@@ -172,7 +172,7 @@
           </div>
         </div>
 
-        <div class="row" id="div_container_sma" style="display:none">
+        <div class="row" id="div_container_sma">
           <div class="col s12">
             <div class="card z-depth-2">
               <div class="card-content">
@@ -352,10 +352,10 @@
           </div>
           <div class="col s6">
             <button class="waves-effect waves-light btn" id="btn_prediction" onclick="onClickPredict()">Make Prediction</button>
-            <div class="spinner-border" id="load_predicting" style="display:none"></div>
+            <button class="waves-effect waves-light btn" id="btn_prediction" onclick="onClickPredictEgen()">Make PredictionEgen</button>
           </div>
         </div>
-        <div class="row" id="div_container_predicting" style="display:none">
+        <div class="row" id="div_container_predicting">
           <div class="col s12">
             <div class="card z-depth-2">
               <div class="card-content">

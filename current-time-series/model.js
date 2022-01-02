@@ -64,8 +64,6 @@ async function trainModel(X, Y, window_size, n_epochs, learning_rate, n_layers, 
 }
 
 function makePredictions(X, model, dict_normalize) {
-  // const predictedResults = model.predict(tf.tensor2d(X, [X.length, X[0].length]).div(tf.scalar(10))).mul(10); // old method
-
   X = tf.tensor2d(X, [X.length, X[0].length]);
   const normalizedInput = normalizeTensor(X, dict_normalize["inputMax"], dict_normalize["inputMin"]);
   const model_out = model.predict(normalizedInput);

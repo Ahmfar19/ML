@@ -2,10 +2,10 @@ let input_dataset = [];
 let result = [];
 let data_raw = [];
 let sma_vec = [];
-let window_size = 50;
+let window_size = 12;
 let trainingsize = 50;
 let data_temporal_resolutions = 'Weekly';
-let add_days = 1;
+let add_days = 7;
 
 $(document).ready(function () {
   $('select').formSelect();
@@ -34,6 +34,7 @@ async function getData(){
 $(function () {
   getData();
   onClickDisplaySMA();
+  onClickValidate();
 });
 
 async function onClickFetchData() {
@@ -198,10 +199,18 @@ async function onClickTrainModel() {
 
 /********** PART3 - VALIDATE ************/
 
-function onClickValidate() {
+async function onClickValidate() {
 
   $("#div_container_validating").show();
   $("#load_validating").show();
+
+  const MODEL_URL = 'http://localhost/htcdoc/MacheanLearning/ML/current-time-series/model_regular/model.json';
+  const model = await tf.loadLayersModel(MODEL_URL);
+  result['model'] = model;
+
+  const normalaized = await fixNormalization();
+  result['normalize'] = normalaized['normalize'];
+
 
   let inputs = sma_vec.map(function (inp_f) {
     return inp_f['set'].map(function (val) { return val['price']; });
@@ -243,6 +252,58 @@ function onClickValidate() {
   Plotly.plot(graph_plot, [{ x: timestamps_c, y: val_unseen_y, name: "Predicted (test)" }], { margin: { t: 0 } });
 
   $("#load_validating").hide();
+}
+
+async function onClickPredict() {
+  let inputs = sma_vec.map(function (inp_f) {
+    return inp_f['set'].map(function (val) { return val['price']; });
+  });
+
+  console.log('inputs :>> ', inputs);
+
+
+  let pred_X = [inputs[inputs.length - 1]];
+
+  console.log('pred_X :>> ', pred_X);
+
+  pred_X = pred_X.slice(Math.floor(trainingsize / 100 * pred_X.length), pred_X.length);
+
+  console.log('pred_X :>> ', pred_X);
+
+  let pred_y = makePredictions(pred_X, result['model'], result['normalize']);
+
+  console.log('pred_Y :>> ', pred_y);
+
+  console.log('result[normalize] :>> ', result['normalize']);
+
+  window_size = parseInt(document.getElementById("input_windowsize").value);
+
+  let timestamps_d = data_raw.map(function (val) {
+    return val['timestamp'];
+  }).splice((data_raw.length - window_size), data_raw.length);
+
+  // date
+  let last_date = new Date(timestamps_d[timestamps_d.length - 1]);
+
+  console.log('last_date :>> ', last_date);
+
+  add_days = 30;
+  last_date.setDate(last_date.getDate() + add_days);
+
+  let next_date = await formatDate(last_date.toString());
+
+  console.log('next_date :>> ', next_date);
+
+  let timestamps_e = [next_date];
+
+  console.log('timestamps_e :>> ', timestamps_e);
+
+  let graph_plot = document.getElementById('div_prediction_graph');
+
+  Plotly.newPlot(graph_plot, [{ x: timestamps_d, y: pred_X[0], name: "Latest Trends" }], { margin: { t: 0 } });
+
+  Plotly.plot(graph_plot, [{ x: timestamps_e, y: pred_y, name: "Predicted Price" }], { margin: { t: 0 } });
+
 }
 
 async function fixNormalization() {
@@ -311,9 +372,15 @@ async function onClickValidateEgen() {
   Plotly.plot(graph_plot, [{ x: timestamps_c, y: val_unseen_y, name: "Predicted (test)" }], { margin: { t: 0 } });
 }
 
-async function onClickPredict() {
+async function onClickPredictEgen() {
   $("#div_container_predicting").show();
   $("#load_predicting").show();
+
+  const MODEL_URL = 'http://localhost/htcdoc/MacheanLearning/ML/current-time-series/model_sma/model.json';
+  const model = await tf.loadLayersModel(MODEL_URL);
+
+  const normalaized = await fixNormalization();
+  console.log('normalaized :>> ', normalaized['normalize']);
 
   let inputs = sma_vec.map(function (inp_f) {
     return inp_f['set'].map(function (val) { return val['price']; });
@@ -330,11 +397,9 @@ async function onClickPredict() {
 
   console.log('pred_X :>> ', pred_X);
 
-  let pred_y = makePredictions(pred_X, result['model'], result['normalize']);
+  let pred_y = makePredictions(pred_X, model, normalaized['normalize']);
 
   console.log('pred_Y :>> ', pred_y);
-
-  console.log('result[normalize] :>> ', result['normalize']);
 
   window_size = parseInt(document.getElementById("input_windowsize").value);
 
