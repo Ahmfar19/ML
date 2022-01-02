@@ -2,7 +2,7 @@ let input_dataset = [];
 let result = [];
 let data_raw = [];
 let sma_vec = [];
-let window_size = 12;
+let window_size = 7;
 let trainingsize = 50;
 let data_temporal_resolutions = 'Weekly';
 let add_days = 7;
@@ -204,7 +204,7 @@ async function onClickValidate() {
   $("#div_container_validating").show();
   $("#load_validating").show();
 
-  const MODEL_URL = 'http://localhost/htcdoc/MacheanLearning/ML/current-time-series/model_month/model.json';
+  const MODEL_URL = 'http://localhost/htcdoc/MacheanLearning/ML/current-time-series/model_week/model.json';
   const model = await tf.loadLayersModel(MODEL_URL);
   result['model'] = model;
 

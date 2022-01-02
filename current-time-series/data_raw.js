@@ -199,4 +199,18 @@ const sampels = [
     { timestamp: '2038-06-28', price: 1 },
     { timestamp: '2038-07-28', price: 3 },
     { timestamp: '2038-08-28', price: 3 },
+    // { timestamp: '2038-09-27', price: 1 },
+    // { timestamp: '2038-10-27', price: 1 },
+    // { timestamp: '2038-12-26', price: 1 },
+    // { timestamp: '2039-01-27', price: 1 },
+    // { timestamp: '2039-02-27', price: 1 },
+    // { timestamp: '2039-03-27', price: 1 },
+    // { timestamp: '2039-04-27', price: 1 },
+    // { timestamp: '2039-05-27', price: 0 },
+    // { timestamp: '2039-06-27', price: 1 },
+    // { timestamp: '2039-07-27', price: 1 },
+    // { timestamp: '2039-07-26', price: 9 },
+
+
+
 ]
