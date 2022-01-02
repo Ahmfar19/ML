@@ -204,7 +204,7 @@ async function onClickValidate() {
   $("#div_container_validating").show();
   $("#load_validating").show();
 
-  const MODEL_URL = 'http://localhost/htcdoc/MacheanLearning/ML/current-time-series/model_regular/model.json';
+  const MODEL_URL = 'http://localhost/htcdoc/MacheanLearning/ML/current-time-series/model_month/model.json';
   const model = await tf.loadLayersModel(MODEL_URL);
   result['model'] = model;
 

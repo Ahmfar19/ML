@@ -58,15 +58,7 @@
         <h5 class="subtitle grey-text text-darken-2">Pull stock prices from online API and perform predictions using Recurrent Neural Network and Long Short-Term Memory (LSTM) with TensorFlow.js framework.</h5>
       </div>
       <div class="card-content">
-        <p>
-          Also, do check out this repo for the <a href="https://github.com/jinglescode/time-series-forecasting-pytorch" target="_blank">PyTorch version</a> where we dig deeper on the model and the data processing steps.
-        </p>
-        <!-- <button class="waves-effect waves-light btn" type="button" onclick="demo()" id="btn_load_demo">
-          Load Snapshot Demo
-        </button>
-        <div id="div_demo_loaded" style="display:none">
-          Demo loaded, scroll down to explore.
-        </div> -->
+
       </div>
     </div>
 
@@ -76,12 +68,6 @@
 
 
         <span class="card-title">Try It</span>
-
-        <p>
-          <!-- [how to use, what you want your reader to do after you end, as simple and obvious] -->
-          Use <i>demo</i> API key to fetch <i>Microsoft Corporation</i> prices or <a href="https://www.alphavantage.co/support/#api-key" target="_blank">get your own API key</a> for other stocks.
-        </p>
-
         <div class="row" id="div_container_getdata">
           <div class="col m4">
             <div class="input-field col s12">
@@ -93,7 +79,6 @@
             <div class="input-field col s12">
               <label for="input_apikey">Alpha Vantage API Key</label>
               <input type="text" id="input_apikey" placeholder="Input your API key or use 'demo'" value="demo">
-              <small class="form-text text-muted">You can claim your API key from <a href="https://www.alphavantage.co/support/#api-key" target="_blank">alphavantage.co</a></small>
             </div>
           </div>
           <div class="col m4">
@@ -161,7 +146,7 @@
           <div class="col s6">
             <div class="input-field col s12">
               <label for="input_windowsize">Window Size</label>
-              <input type="number" id="input_windowsize" placeholder="a number" value="12">
+              <input type="number" id="input_windowsize" placeholder="a number" value="30">
               <small class="form-text text-muted">This is the "time window" for SMA</small>
             </div>
           </div>
@@ -286,19 +271,7 @@
     <div class="card">
       <div class="card-content">
         <span class="card-title">Validation</span>
-        <p>
-          <!-- [purpose of this step, fun for the reader] -->
-          Now that you have trained your model, it is time to use the model.predict function from TFJS to predicting future values. We have split the data into 2 sets, a subset of the data is training and the rest is the validation set. The training set has been used for training the model, thus will be using the validation set to validate the model. Since the model has not seen the data in the validation set before, it will be good if the model is able to predict values that are close to the exact values.
-        </p>
-        <span class="card-title">Try It</span>
-        <p>So let us use the remaining data for prediction which allow us to see how closely our predicted values are compared to the actual values.</p>
-        <p>But if the model did not predict values that map closely to its true values, check the training loss graph. Generally, this model should converge with the loss to be less than 1. You can increase the number of epochs, or tweak the other learning hyperparameters.</p>
-
-        <div class="row" id="div_container_validatefirst">
-          <div class="col s12">
-            <p>Don’t have a model to perform prediction? <a href="#div_train">Train your model</a>.</p>
-          </div>
-        </div>
+     
 
         <div class="row" id="div_container_validate">
           <div class="col s12">
@@ -332,17 +305,9 @@
     <div class="card">
       <div class="card-content">
         <span class="card-title">Make Prediction</span>
-        <p>
-          <!-- [purpose of this step, fun for the reader] -->
-          Finally, the model has been validated and the predicted values map closely to its true values, we shall use it to predict the future. We will apply the same model.predict function and use the last {{input_windowsize}} data points as the input, because that is our window size. This means that, if our training data is increment daily, we will use the past {{input_windowsize}} days as input, to predict the next day.
-        </p>
+
 
         <span class="card-title">Try It</span>
-        <div class="row" id="div_container_predictfirst">
-          <div class="col s12">
-            <p>Don’t have a model to perform prediction? <a href="#div_train">Train your model</a>.</p>
-          </div>
-        </div>
         <div class="row" id="div_container_predict">
           <div class="col s12">
             <p>
