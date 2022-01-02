@@ -245,16 +245,30 @@ function onClickValidate() {
   $("#load_validating").hide();
 }
 
+async function fixNormalization() {
+
+  let inputs = sma_vec.map(function (inp_f) {
+    return inp_f['set'].map(function (val) { return val['price']; })
+  });
+  let outputs = sma_vec.map(function (outp_f) { return outp_f['avg']; });
+
+  // ## new: load data into tensor and normalize data
+  const inputTensor = tf.tensor2d(inputs, [inputs.length, inputs[0].length])
+  const labelTensor = tf.tensor2d(outputs, [outputs.length, 1]).reshape([outputs.length, 1])
+
+  const [xs, inputMax, inputMin] = normalizeTensorFit(inputTensor)
+  const [ys, labelMax, labelMin] = normalizeTensorFit(labelTensor)
+
+  return {normalize: { inputMax: inputMax, inputMin: inputMin, labelMax: labelMax, labelMin: labelMin }};
+}
+
 async function onClickValidateEgen() {
 
-  const MODEL_URL = 'http://localhost/htcdoc/teeeeeeeeeee/model_sma1/model.json';
-  // const model = await tf.loadLayersModel(MODEL_URL);
-  // const model = await tf.loadLayersModel('model.json');
-
+  const MODEL_URL = 'http://localhost/htcdoc/MacheanLearning/ML/current-time-series/model_sma/model.json';
   const model = await tf.loadLayersModel(MODEL_URL);
-  model.summary();
 
-  return;
+  const normalaized = await fixNormalization();
+  console.log('normalaized :>> ', normalaized['normalize']);
 
   let inputs = sma_vec.map(function (inp_f) {
     return inp_f['set'].map(function (val) { return val['price']; });
@@ -265,15 +279,15 @@ async function onClickValidateEgen() {
   console.log('val_train_x', val_train_x)
   console.log('trainingsize :>> ', trainingsize);
 
-  let val_train_y = makePredictions(val_train_x, result['model'], result['normalize']);
-  // console.log('val_train_y', val_train_y)
+  let val_train_y = makePredictions(val_train_x, model, normalaized['normalize']);
+  console.log('val_train_y', val_train_y)
 
   // validate on unseen
   let val_unseen_x = inputs.slice(Math.floor(trainingsize / 100 * inputs.length), inputs.length);
-  // console.log('val_unseen_x', val_unseen_x)
+  console.log('val_unseen_x', val_unseen_x)
 
-  let val_unseen_y = makePredictions(val_unseen_x, result['model'], result['normalize']);
-  // console.log('val_unseen_y', val_unseen_y)
+  let val_unseen_y = makePredictions(val_unseen_x, model, normalaized['normalize']);
+  console.log('val_unseen_y', val_unseen_y)
   let timestamps_a = data_raw.map(function (val) { return val['timestamp']; });
 
   let timestamps_b = data_raw.map(function (val) {
@@ -296,9 +310,6 @@ async function onClickValidateEgen() {
   Plotly.plot(graph_plot, [{ x: timestamps_b, y: val_train_y, name: "Predicted (train)" }], { margin: { t: 0 } });
   Plotly.plot(graph_plot, [{ x: timestamps_c, y: val_unseen_y, name: "Predicted (test)" }], { margin: { t: 0 } });
 }
-
-// var mod;
-// fetch('model.json').then(response => response.json()).then(data => mod = data);
 
 async function onClickPredict() {
   $("#div_container_predicting").show();
@@ -387,13 +398,12 @@ function formatDate(date) {
 
 
 async function run() {
-  // const MODEL_URL = 'http://localhost/htcdoc/teeeeeeeeeee/model.json';
+  const MODEL_URL = 'http://localhost/htcdoc/MacheanLearning/ML/current-time-series/model_sma/model.json';
   // const model = await tf.loadLayersModel(MODEL_URL);
-  const model = await tf.loadLayersModel('model.json');
-  // const model = await tf.loadLayersModel('http://localhost/htcdoc/teeeeeeeeeee/model.json');
+  // const model = await tf.loadLayersModel('model.json');
+  const model = await tf.loadLayersModel(MODEL_URL);
   model.summary();
 }
-
 // run();
 
 $("#upload-weights").change(async function () {
@@ -403,3 +413,5 @@ $("#upload-weights").change(async function () {
   model.summary();
 })
 
+// var mod;
+// fetch('model.json').then(response => response.json()).then(data => mod = data);
