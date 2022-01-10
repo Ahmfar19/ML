@@ -1,3 +1,8 @@
+#!C:\Users\Dator\AppData\Local\Programs\Python\Python39\python.exe
+print('Content-type: text/html\n')
+print("Hello XAMPP")
+
+import cgi
 from pandas import DataFrame
 from pandas import Series
 from pandas import concat
@@ -13,10 +18,18 @@ from matplotlib import pyplot
 import numpy
 from keras.models import load_model
 
+form = cgi.FieldStorage()
+
+data = form.getvalue("mess")
+
+
+print("111")
 
 # date-time parsing function for loading the dataset
 def parser(x):
 	return datetime.strptime('190'+x, '%Y-%m')
+
+print("222")
 
 # frame a sequence as a supervised learning problem
 def timeseries_to_supervised(data, lag=1):
@@ -80,14 +93,15 @@ def forecast_lstm(model, batch_size, X):
 	yhat = model.predict(X, batch_size=batch_size)
 	return yhat[0,0]
 
+
 # load dataset
 series = read_csv('shampoo-sales.csv', header=0, parse_dates=[0], index_col=0, squeeze=True, date_parser=parser)
 
 # transform data to be stationary
 raw_values = series.values
 diff_values = difference(raw_values, 1)
-print('raw_values ', raw_values)
-print('diff_values', diff_values)
+# print('raw_values ', raw_values)
+# print('diff_values', diff_values)
 
 # transform data to be supervised learning
 supervised = timeseries_to_supervised(diff_values, 1)
@@ -98,8 +112,8 @@ print('supervised_values ', supervised_values)
 # split data into train and test-sets
 train, test = supervised_values[0:-12], supervised_values[-12:]
 
-print("train " ,train)
-print("test ", test)
+# print("train " ,train)
+# print("test ", test)
 
 # transform the scale of the data
 scaler, train_scaled, test_scaled = scale(train, test)
@@ -118,30 +132,4 @@ lstm_model.predict(train_reshaped, batch_size=1)
  
 # walk-forward validation on the test data
 predictions = list()
-
-print('test_scaled', test_scaled)
-
-for i in range(len(test_scaled)):
-	# make one-step forecast
-	X, y = test_scaled[i, 0:-1], test_scaled[i, -1]
-
-	print('X, ', X)
-	print('y, ', y)
-
-	yhat = forecast_lstm(lstm_model, 1, X)
-	# invert scaling
-	yhat = invert_scale(scaler, X, yhat)
-	# invert differencing
-	yhat = inverse_difference(raw_values, yhat, len(test_scaled)+1-i)
-	# store forecast
-	predictions.append(yhat)
-	expected = raw_values[len(train) + i + 1]
-	print('Month=%d, Predicted=%f, Expected=%f' % (i+1, yhat, expected))
- 
-# report performance
-rmse = sqrt(mean_squared_error(raw_values[-12:], predictions))
-print('Test RMSE: %.3f' % rmse)
-# line plot of observed vs predicted
-pyplot.plot(raw_values[-12:])
-pyplot.plot(predictions)
-# pyplot.show()
+# print('test_scaled', test_scaled)
